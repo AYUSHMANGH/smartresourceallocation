@@ -107,12 +107,12 @@ export default function Landing() {
               <h4 className="font-bold text-charcoal text-sm">Paper Forms</h4>
               <p className="text-xs text-muted mt-2">Intelligent scanning turns handwritten data into digital insights.</p>
             </div>
-            <div className="card p-6 bg-surface border border-linen-dark translate-y-8">
+            <div className="card p-6 bg-surface border border-linen-dark md:translate-y-8">
               <span className="text-2xl mb-4 block">📱</span>
               <h4 className="font-bold text-charcoal text-sm">Digital Portal</h4>
               <p className="text-xs text-muted mt-2">Simple, accessible entry for mobile-first communities.</p>
             </div>
-            <div className="card p-6 bg-surface border border-linen-dark -translate-y-8">
+            <div className="card p-6 bg-surface border border-linen-dark md:-translate-y-8">
               <span className="text-2xl mb-4 block">💬</span>
               <h4 className="font-bold text-charcoal text-sm">Oral Surveys</h4>
               <p className="text-xs text-muted mt-2">Voice-to-data capture for inclusive community outreach.</p>

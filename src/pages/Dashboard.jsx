@@ -106,7 +106,7 @@ export default function Dashboard() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <StatCard label="Total Active Needs" value={totalNeeds} badge="+12% from last week" badgeColor="text-terra" icon="📋" />
           <StatCard label="Assigned Volunteers" value={volunteers} sub="67% capacity reached" icon="👥" />
           <StatCard label="Impact Score" value={impactScore} icon="⚡" dark />
@@ -134,35 +134,39 @@ export default function Dashboard() {
                   View All <span>›</span>
                 </button>
               </div>
-              <div className="mb-3 grid grid-cols-4 gap-4">
-                <span className="section-label">Need Type</span>
-                <span className="section-label">Location</span>
-                <span className="section-label">Urgency</span>
-                <span className="section-label">Action</span>
-              </div>
-              <div className="flex flex-col gap-3">
-                {displayNeeds.map((need, i) => {
-                  const cfg = URGENCY_CONFIG[need.status] || URGENCY_CONFIG.medium;
-                  const icons = { Medical: '🩺', Food: '🍽️', Shelter: '🏕️', Water: '💧' };
-                  return (
-                    <div key={need.id || i} className="grid grid-cols-4 gap-4 items-center py-3 border-b border-linen-dark last:border-0">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-linen flex items-center justify-center text-sm">
-                          {icons[need.category] || '📦'}
+              <div className="overflow-x-auto">
+                <div className="min-w-[500px]">
+                  <div className="mb-3 grid grid-cols-4 gap-4">
+                    <span className="section-label">Need Type</span>
+                    <span className="section-label">Location</span>
+                    <span className="section-label">Urgency</span>
+                    <span className="section-label">Action</span>
+                  </div>
+                  <div className="flex flex-col gap-3">
+                    {displayNeeds.map((need, i) => {
+                      const cfg = URGENCY_CONFIG[need.status] || URGENCY_CONFIG.medium;
+                      const icons = { Medical: '🩺', Food: '🍽️', Shelter: '🏕️', Water: '💧' };
+                      return (
+                        <div key={need.id || i} className="grid grid-cols-4 gap-4 items-center py-3 border-b border-linen-dark last:border-0">
+                          <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-xl bg-linen flex items-center justify-center text-sm">
+                              {icons[need.category] || '📦'}
+                            </div>
+                            <div>
+                              <p className="text-sm font-semibold text-charcoal">{need.category} — {need.subCategory}</p>
+                              <p className="text-xs text-muted">{need.description}</p>
+                            </div>
+                          </div>
+                          <p className="text-sm text-charcoal">{need.location}</p>
+                          <span className={cfg.className}>{cfg.label}</span>
+                          <button className="w-8 h-8 rounded-full bg-linen flex items-center justify-center hover:bg-linen-dark transition-colors text-charcoal">
+                            →
+                          </button>
                         </div>
-                        <div>
-                          <p className="text-sm font-semibold text-charcoal">{need.category} — {need.subCategory}</p>
-                          <p className="text-xs text-muted">{need.description}</p>
-                        </div>
-                      </div>
-                      <p className="text-sm text-charcoal">{need.location}</p>
-                      <span className={cfg.className}>{cfg.label}</span>
-                      <button className="w-8 h-8 rounded-full bg-linen flex items-center justify-center hover:bg-linen-dark transition-colors text-charcoal">
-                        →
-                      </button>
-                    </div>
-                  );
-                })}
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             </div>
 

@@ -26,6 +26,19 @@ export default function Chatbot() {
     await askGemini(userMessage, context);
   };
 
+  const suggestions = [
+    "How does the priority scoring work?",
+    "Where is the Governance panel?",
+    "How do I sign up as a volunteer?"
+  ];
+
+  const handleSuggestionClick = async (text) => {
+    if (loading) return;
+    setMessages(prev => [...prev, { role: 'user', text }]);
+    const context = "You are the ResilienceNet AI assistant. ResilienceNet is an NGO management platform for smart resource allocation. You help volunteers sign up, explain how the needs assessment scoring works, and guide admins to the governance panel. Keep answers brief, warm, and helpful.";
+    await askGemini(text, context);
+  };
+
   useEffect(() => {
     if (response !== null && !loading) {
       setMessages(prev => [...prev, { role: 'ai', text: response }]);
@@ -82,6 +95,23 @@ export default function Chatbot() {
                 </div>
               </div>
             )}
+            
+            {/* Suggestive Questions */}
+            {messages.length === 1 && !loading && (
+              <div className="flex flex-col gap-2 mt-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                <p className="text-[10px] text-white/50 uppercase tracking-widest font-bold ml-1 mb-1">Suggested Questions</p>
+                {suggestions.map((sug, i) => (
+                  <button 
+                    key={i}
+                    onClick={() => handleSuggestionClick(sug)}
+                    className="text-left text-xs text-sage bg-sage/10 hover:bg-sage/20 border border-sage/20 px-4 py-2.5 rounded-xl transition-colors"
+                  >
+                    {sug}
+                  </button>
+                ))}
+              </div>
+            )}
+            
             <div ref={chatEndRef} />
           </div>
 

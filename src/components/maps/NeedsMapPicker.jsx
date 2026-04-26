@@ -1,82 +1,75 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import toast from 'react-hot-toast';
+import L from 'leaflet';
 
-const PICKER_MAP_STYLE = [
-  { "elementType": "geometry", "stylers": [{ "color": "#f5f5f5" }] },
-  { "featureType": "road", "elementType": "geometry", "stylers": [{ "color": "#ffffff" }] },
-  { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#e9e9e9" }] },
-  { "featureType": "poi", "stylers": [{ "visibility": "off" }] },
-  { "featureType": "transit", "stylers": [{ "visibility": "off" }] }
-];
+// Fix for default marker icons in react-leaflet
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
+function LocationMarker({ position, setPosition, onLocationSelect }) {
+  const markerRef = useRef(null);
+
+  const fetchAddress = async (lat, lng) => {
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+      const data = await res.json();
+      const address = data.display_name || `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`;
+      onLocationSelect(lat, lng, address);
+    } catch (e) {
+      onLocationSelect(lat, lng, `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`);
+    }
+  };
+
+  useMapEvents({
+    click(e) {
+      setPosition(e.latlng);
+      fetchAddress(e.latlng.lat, e.latlng.lng);
+    },
+  });
+
+  const eventHandlers = useMemo(
+    () => ({
+      dragend() {
+        const marker = markerRef.current;
+        if (marker != null) {
+          const latlng = marker.getLatLng();
+          setPosition(latlng);
+          fetchAddress(latlng.lat, latlng.lng);
+        }
+      },
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
+  return position === null ? null : (
+    <Marker
+      draggable={true}
+      eventHandlers={eventHandlers}
+      position={position}
+      ref={markerRef}
+    />
+  );
+}
+
+function CenterMap({ position }) {
+  const map = useMap();
+  useEffect(() => {
+    if (position) {
+      map.setView(position, map.getZoom() < 15 ? 15 : map.getZoom());
+    }
+  }, [position, map]);
+  return null;
+}
 
 export default function NeedsMapPicker({ onLocationSelect }) {
-  const mapRef = useRef(null);
-  const gMapRef = useRef(null);
-  const markerRef = useRef(null);
-  const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    const checkGoogle = setInterval(() => {
-      if (window.google && window.google.maps) {
-        clearInterval(checkGoogle);
-        initMap();
-      }
-    }, 100);
-
-    const initMap = () => {
-      if (!mapRef.current) return;
-
-      const map = new window.google.maps.Map(mapRef.current, {
-        center: { lat: 20.5937, lng: 78.9629 }, // India Default
-        zoom: 4.5,
-        styles: PICKER_MAP_STYLE,
-        disableDefaultUI: true,
-        zoomControl: true,
-      });
-      gMapRef.current = map;
-
-      markerRef.current = new window.google.maps.Marker({
-        position: { lat: 20.5937, lng: 78.9629 },
-        map,
-        draggable: true,
-        animation: window.google.maps.Animation.DROP,
-        icon: {
-          path: "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z",
-          fillColor: "#C96A42",
-          fillOpacity: 1,
-          strokeWeight: 2,
-          strokeColor: "#FFFFFF",
-          scale: 2,
-          anchor: new window.google.maps.Point(12, 24),
-        }
-      });
-
-      const geocoder = new window.google.maps.Geocoder();
-
-      const updateLocation = (pos) => {
-        geocoder.geocode({ location: pos }, (results, status) => {
-          let address = `Lat: ${pos.lat().toFixed(4)}, Lng: ${pos.lng().toFixed(4)}`;
-          if (status === "OK" && results[0]) {
-            address = results[0].formatted_address;
-          }
-          onLocationSelect(pos.lat(), pos.lng(), address);
-        });
-      };
-
-      markerRef.current.addListener('dragend', function() {
-        updateLocation(markerRef.current.getPosition());
-      });
-
-      map.addListener('click', (e) => {
-        markerRef.current.setPosition(e.latLng);
-        updateLocation(e.latLng);
-      });
-
-      setLoaded(true);
-    };
-
-    return () => clearInterval(checkGoogle);
-  }, []);
+  const [position, setPosition] = useState({ lat: 20.5937, lng: 78.9629 });
+  const [mapCenter, setMapCenter] = useState(null);
 
   const handleMyLocation = (e) => {
     e.preventDefault();
@@ -87,22 +80,19 @@ export default function NeedsMapPicker({ onLocationSelect }) {
     
     toast.loading("Locating...", { id: 'locating' });
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      async (pos) => {
         toast.dismiss('locating');
-        const pos = { lat: position.coords.latitude, lng: position.coords.longitude };
-        if (gMapRef.current && markerRef.current) {
-          gMapRef.current.setCenter(pos);
-          gMapRef.current.setZoom(15);
-          markerRef.current.setPosition(pos);
-          
-          const geocoder = new window.google.maps.Geocoder();
-          geocoder.geocode({ location: pos }, (results, status) => {
-            let address = `Lat: ${pos.lat.toFixed(4)}, Lng: ${pos.lng.toFixed(4)}`;
-            if (status === "OK" && results[0]) {
-              address = results[0].formatted_address;
-            }
-            onLocationSelect(pos.lat, pos.lng, address);
-          });
+        const newPos = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        setPosition(newPos);
+        setMapCenter(newPos); // triggers Map view update
+        
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${newPos.lat}&lon=${newPos.lng}`);
+          const data = await res.json();
+          const address = data.display_name || `Lat: ${newPos.lat.toFixed(4)}, Lng: ${newPos.lng.toFixed(4)}`;
+          onLocationSelect(newPos.lat, newPos.lng, address);
+        } catch (e) {
+          onLocationSelect(newPos.lat, newPos.lng, `Lat: ${newPos.lat.toFixed(4)}, Lng: ${newPos.lng.toFixed(4)}`);
         }
       },
       () => {
@@ -113,19 +103,22 @@ export default function NeedsMapPicker({ onLocationSelect }) {
 
   return (
     <div className="relative w-full h-[320px] rounded-2xl overflow-hidden border border-linen-dark shadow-inner bg-linen">
-      {!loaded && (
-        <div className="absolute inset-0 flex items-center justify-center z-10">
-          <div className="w-6 h-6 border-2 border-sage border-t-transparent rounded-full animate-spin" />
-        </div>
-      )}
-      <div ref={mapRef} className="w-full h-full" />
-      <div className="absolute top-4 left-4 right-4 pointer-events-none">
-        <div className="glass px-3 py-2 rounded-xl text-[10px] font-bold text-muted uppercase tracking-wider flex items-center gap-2">
+      <MapContainer center={{ lat: 20.5937, lng: 78.9629 }} zoom={4.5} style={{ height: '100%', width: '100%', zIndex: 1 }}>
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        <LocationMarker position={position} setPosition={setPosition} onLocationSelect={onLocationSelect} />
+        {mapCenter && <CenterMap position={mapCenter} />}
+      </MapContainer>
+      
+      <div className="absolute top-4 left-4 right-4 pointer-events-none z-[400]">
+        <div className="glass px-3 py-2 rounded-xl text-[10px] font-bold text-muted uppercase tracking-wider flex items-center gap-2 w-fit">
           <span>📍</span> Click map or drag pin to specify location
         </div>
       </div>
       <button 
-        className="absolute bottom-4 right-4 bg-white text-charcoal px-4 py-2 rounded-xl text-xs font-bold shadow-lg border border-linen-dark hover:bg-linen transition-colors active:scale-95 flex items-center gap-2"
+        className="absolute bottom-4 right-4 bg-white text-charcoal px-4 py-2 rounded-xl text-xs font-bold shadow-lg border border-linen-dark hover:bg-linen transition-colors active:scale-95 flex items-center gap-2 z-[400]"
         onClick={handleMyLocation}
       >
         <span>🎯</span> Use My Location

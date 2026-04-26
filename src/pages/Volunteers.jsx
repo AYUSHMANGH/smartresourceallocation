@@ -208,16 +208,16 @@ export default function Volunteers() {
                     <span className="text-xs font-bold text-charcoal">{v.availability}</span>
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap sm:flex-nowrap justify-end mt-2 sm:mt-0">
                   <button 
                     onClick={() => setNotifyModal({ show: true, user: v, message: '' })}
-                    className="btn-secondary py-1.5 px-3 text-xs flex items-center gap-1"
+                    className="btn-secondary py-1.5 px-3 text-xs flex items-center justify-center gap-1 flex-1 sm:flex-none"
                   >
                     <span>🔔</span> Notify
                   </button>
                   <button 
                     onClick={() => handleAssign(v)}
-                    className={`btn-outline py-1.5 text-xs ${v.availability !== 'Available' ? 'opacity-50' : ''}`}
+                    className={`btn-outline py-1.5 text-xs flex-1 sm:flex-none ${v.availability !== 'Available' ? 'opacity-50' : ''}`}
                   >
                     {v.availability === 'Available' ? 'Quick Assign' : 'Unassign'}
                   </button>

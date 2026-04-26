@@ -50,8 +50,16 @@ export default function AppLayout({ children }) {
 
   return (
     <div className="flex min-h-screen bg-linen font-manrope">
+      {/* Mobile Backdrop */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 bg-charcoal/50 backdrop-blur-sm z-40 md:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-52 shrink-0 bg-surface flex flex-col py-6 px-4 border-r border-linen-dark hidden md:flex">
+      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-surface flex flex-col py-6 px-4 shadow-2xl transition-transform transform ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 md:w-52 md:border-r md:border-linen-dark md:shadow-none`}>
         {/* Logo */}
         <div className="mb-8 px-2">
           <span className="text-lg font-extrabold text-charcoal tracking-tight">ResilienceNet</span>
@@ -67,6 +75,7 @@ export default function AppLayout({ children }) {
             <NavLink
               key={item.to}
               to={item.to}
+              onClick={() => setMobileOpen(false)}
               className={({ isActive }) =>
                 `sidebar-link ${isActive ? 'sidebar-link-active' : ''}`
               }
@@ -79,6 +88,7 @@ export default function AppLayout({ children }) {
           {isAdmin && (
             <NavLink
               to="/governance"
+              onClick={() => setMobileOpen(false)}
               className={({ isActive }) => `sidebar-link ${isActive ? 'sidebar-link-active' : ''}`}
             >
               <span className="text-base">🛡️</span>
@@ -89,7 +99,7 @@ export default function AppLayout({ children }) {
 
         {/* Post Need CTA */}
         <button
-          onClick={() => navigate('/needs')}
+          onClick={() => { navigate('/needs'); setMobileOpen(false); }}
           className="btn-terra w-full mb-4 flex items-center justify-center gap-2"
         >
           <span className="text-lg">+</span> Post Need
@@ -97,7 +107,7 @@ export default function AppLayout({ children }) {
 
         {/* Bottom links */}
         <div className="flex flex-col gap-1 border-t border-linen-dark pt-4">
-          <NavLink to="/insights" className={({ isActive }) => `sidebar-link ${isActive ? 'sidebar-link-active' : ''}`}>
+          <NavLink to="/insights" onClick={() => setMobileOpen(false)} className={({ isActive }) => `sidebar-link ${isActive ? 'sidebar-link-active' : ''}`}>
             <span>🤖</span><span>AI Insights</span>
           </NavLink>
           <button onClick={handleSignOut} className="sidebar-link text-left">
@@ -109,8 +119,14 @@ export default function AppLayout({ children }) {
       {/* Main area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Topbar */}
-        <header className="bg-surface/70 backdrop-blur-lg border-b border-linen-dark px-6 py-4 flex items-center justify-between sticky top-0 z-30">
-          <div className="flex items-center gap-6">
+        <header className="bg-surface/70 backdrop-blur-lg border-b border-linen-dark px-4 md:px-6 py-4 flex items-center justify-between sticky top-0 z-30">
+          <div className="flex items-center gap-4 md:gap-6">
+            <button
+              className="md:hidden text-2xl text-charcoal hover:text-sage transition-colors pb-1"
+              onClick={() => setMobileOpen(true)}
+            >
+              ☰
+            </button>
             <span className="text-base font-extrabold text-charcoal md:hidden">ResilienceNet</span>
             <nav className="hidden md:flex items-center gap-6">
               {[
@@ -138,9 +154,9 @@ export default function AppLayout({ children }) {
             >
               Volunteer
             </button>
-            
+
             <div className="relative">
-              <button 
+              <button
                 onClick={() => setShowNotifications(!showNotifications)}
                 className="w-9 h-9 rounded-full bg-linen flex items-center justify-center text-muted hover:bg-linen-dark transition-colors relative"
               >
@@ -149,7 +165,7 @@ export default function AppLayout({ children }) {
                   <span className="absolute top-0 right-0 w-3 h-3 bg-terra rounded-full border-2 border-surface"></span>
                 )}
               </button>
-              
+
               {showNotifications && (
                 <div className="absolute top-12 right-0 w-80 bg-surface rounded-2xl shadow-xl border border-linen-dark overflow-hidden z-50">
                   <div className="p-4 border-b border-linen-dark bg-linen">
@@ -160,9 +176,9 @@ export default function AppLayout({ children }) {
                       <div className="p-6 text-center text-muted text-sm">No new notifications</div>
                     ) : (
                       notifications.map(n => (
-                        <div 
-                          key={n.id} 
-                          onClick={() => { if(!n.read) markAsRead(n.id) }}
+                        <div
+                          key={n.id}
+                          onClick={() => { if (!n.read) markAsRead(n.id) }}
                           className={`p-4 border-b border-linen cursor-pointer hover:bg-linen transition-colors ${!n.read ? 'bg-sage-50/50' : ''}`}
                         >
                           <div className="flex justify-between items-start mb-1">
@@ -183,13 +199,13 @@ export default function AppLayout({ children }) {
             </button>
             <div className="flex items-center gap-3 ml-2">
               <span className="text-sm font-semibold text-charcoal hidden sm:block">
-                Hi, {user?.displayName?.split(' ')[0] || 'User'}
+                {isAdmin ? 'Hi Admin' : `Hi, ${user?.displayName?.split(' ')[0] || 'User'}`}
               </span>
               <div className="w-9 h-9 rounded-full bg-sage flex items-center justify-center text-white text-sm font-bold overflow-hidden border border-linen-dark">
                 {user?.photoURL ? (
                   <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
-                  initials
+                  isAdmin ? 'A' : initials
                 )}
               </div>
             </div>

@@ -14,7 +14,7 @@ export default function Analytics() {
         </div>
 
         {/* KPI Row */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {[
             { label: 'Lives Impacted', val: '42.8k', trend: '+14%', color: 'text-sage' },
             { label: 'Resources Delivered', val: '128.4t', trend: '+8.2%', color: 'text-terra' },
@@ -33,7 +33,7 @@ export default function Analytics() {
           ))}
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Mock Charts */}
           <div className="card p-8">
             <h3 className="text-lg font-bold text-charcoal mb-6">Lives Impacted Over Time</h3>

@@ -66,7 +66,7 @@ export default function Tasks() {
         </div>
 
         {/* Goal Progress Section */}
-        <div className="grid lg:grid-cols-3 gap-6 mb-10">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
           <div className="lg:col-span-2 bg-sage rounded-2xl p-8 text-white relative overflow-hidden flex flex-col justify-between min-h-[220px]">
              <div className="relative z-10">
                <p className="text-sm font-bold opacity-80 mb-2">Food Security Goal</p>
@@ -106,7 +106,7 @@ export default function Tasks() {
         </div>
 
         {/* Task Board */}
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {STATUS_COLUMNS.map(col => (
             <div 
               key={col.id} 
