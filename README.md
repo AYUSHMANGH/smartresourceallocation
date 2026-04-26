@@ -297,16 +297,16 @@ Smart-Resource-Allocation/
 ## 📸 Screenshots
 
 ### Landing Page
-![Landing Page](https://via.placeholder.com/1200x600/6B7F5E/FFFFFF?text=Landing+Page)
+![Landing Page](screenshots/landing.png)
 
 ### Dashboard
-![Dashboard](https://via.placeholder.com/1200x600/6B7F5E/FFFFFF?text=Dashboard)
+![Dashboard](screenshots/dashboard.png)
 
 ### Governance Console
-![Governance Console](https://via.placeholder.com/1200x600/6B7F5E/FFFFFF?text=Governance+Console)
+![Governance Console](screenshots/governance.png)
 
 ### Needs Assessment Map
-![Needs Map](https://via.placeholder.com/1200x600/6B7F5E/FFFFFF?text=Needs+Assessment+Map)
+![Needs Map](screenshots/needs.png)
 
 ---
 
