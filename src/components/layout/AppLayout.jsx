@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { signOut } from '../../firebase/auth';
-import { subscribeToCollection, updateDocument } from '../../firebase/firestore';
+import { subscribeToCollection, updateDocument, query, where } from '../../firebase/firestore';
 import toast from 'react-hot-toast';
 import Chatbot from '../chatbot/Chatbot';
 
@@ -14,6 +14,18 @@ const navItems = [
   { to: '/analytics', label: 'Reports', icon: '📊' },
 ];
 
+function formatNotificationTime(createdAt) {
+  if (!createdAt) return 'Just now';
+  const date = createdAt.toDate ? createdAt.toDate() : new Date(createdAt);
+  const now = new Date();
+  const diffInSeconds = Math.floor((now - date) / 1000);
+
+  if (diffInSeconds < 60) return 'Just now';
+  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+  return date.toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
 export default function AppLayout({ children }) {
   const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
@@ -24,11 +36,14 @@ export default function AppLayout({ children }) {
   useEffect(() => {
     if (!user) return;
     const unsub = subscribeToCollection('notifications', (data) => {
-      const myNotifs = data
-        .filter(n => n.recipientId === user.uid)
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      setNotifications(myNotifs);
-    });
+      // Sort: newest at top (handle both Timestamp objects and strings)
+      const sorted = data.sort((a, b) => {
+        const timeA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
+        const timeB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
+        return timeB - timeA;
+      });
+      setNotifications(sorted);
+    }, [where('recipientId', '==', user.uid)]);
     return unsub;
   }, [user]);
 
@@ -44,6 +59,17 @@ export default function AppLayout({ children }) {
     await updateDocument('notifications', id, { read: true });
   };
 
+  const deleteNotification = async (e, id) => {
+    e.stopPropagation();
+    try {
+      const { deleteDocument } = await import('../../firebase/firestore');
+      await deleteDocument('notifications', id);
+      toast.success('Notification deleted');
+    } catch (err) {
+      toast.error('Failed to delete');
+    }
+  };
+
   const initials = user?.displayName
     ? user.displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
     : user?.email?.slice(0, 2).toUpperCase() || 'U';
@@ -53,13 +79,22 @@ export default function AppLayout({ children }) {
       {/* Mobile Backdrop */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 bg-charcoal/50 backdrop-blur-sm z-40 md:hidden"
+          className="fixed inset-0 bg-charcoal/50 backdrop-blur-sm z-[1999] md:hidden"
           onClick={() => setMobileOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-surface flex flex-col py-6 px-4 shadow-2xl transition-transform transform ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 md:w-52 md:border-r md:border-linen-dark md:shadow-none`}>
+      <aside className={`fixed inset-y-0 left-0 z-[2000] w-[280px] bg-surface flex flex-col py-6 px-4 shadow-2xl transition-transform duration-300 ease-in-out transform ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 md:w-52 md:border-r md:border-linen-dark md:shadow-none`}>
+        {/* Close Button (Mobile Only) */}
+        <button 
+          onClick={() => setMobileOpen(false)}
+          className="absolute top-4 right-4 md:hidden w-8 h-8 flex items-center justify-center text-muted hover:text-charcoal bg-linen rounded-full"
+          aria-label="Close menu"
+        >
+          ✕
+        </button>
+
         {/* Logo */}
         <div className="mb-8 px-2">
           <span className="text-lg font-extrabold text-charcoal tracking-tight">ResilienceNet</span>
@@ -113,6 +148,10 @@ export default function AppLayout({ children }) {
           <button onClick={handleSignOut} className="sidebar-link text-left">
             <span>↗</span><span>Sign Out</span>
           </button>
+          <div className="px-3 py-2 text-[8px] text-muted opacity-50 font-bold uppercase tracking-widest flex flex-col gap-0.5">
+            <span>v1.4.4 · AUTH-SYNC-20260426</span>
+            <span>UID: {user?.uid?.slice(0, 8) || 'NONE'}</span>
+          </div>
         </div>
       </aside>
 
@@ -122,12 +161,13 @@ export default function AppLayout({ children }) {
         <header className="bg-surface/70 backdrop-blur-lg border-b border-linen-dark px-4 md:px-6 py-4 flex items-center justify-between sticky top-0 z-30">
           <div className="flex items-center gap-4 md:gap-6">
             <button
-              className="md:hidden text-2xl text-charcoal hover:text-sage transition-colors pb-1"
+              className="md:hidden text-2xl text-charcoal hover:text-sage transition-colors pb-1 w-10 h-10 flex items-center justify-center bg-linen rounded-xl"
               onClick={() => setMobileOpen(true)}
+              aria-label="Open menu"
             >
               ☰
             </button>
-            <span className="text-base font-extrabold text-charcoal md:hidden">ResilienceNet</span>
+            <span className="text-base font-extrabold text-charcoal md:hidden truncate max-w-[120px]">ResilienceNet</span>
             <nav className="hidden md:flex items-center gap-6">
               {[
                 { label: 'Dashboard', path: '/dashboard' },
@@ -147,7 +187,7 @@ export default function AppLayout({ children }) {
             </nav>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <button
               onClick={() => navigate('/needs')}
               className="btn-primary hidden sm:flex items-center gap-2"
@@ -167,7 +207,7 @@ export default function AppLayout({ children }) {
               </button>
 
               {showNotifications && (
-                <div className="absolute top-12 right-0 w-80 bg-surface rounded-2xl shadow-xl border border-linen-dark overflow-hidden z-50">
+                <div className="fixed sm:absolute top-16 sm:top-12 left-4 right-4 sm:left-auto sm:right-0 w-auto sm:w-80 bg-surface rounded-2xl shadow-2xl border border-linen-dark overflow-hidden z-[100] animate-in">
                   <div className="p-4 border-b border-linen-dark bg-linen">
                     <h3 className="font-bold text-charcoal">Notifications</h3>
                   </div>
@@ -179,13 +219,25 @@ export default function AppLayout({ children }) {
                         <div
                           key={n.id}
                           onClick={() => { if (!n.read) markAsRead(n.id) }}
-                          className={`p-4 border-b border-linen cursor-pointer hover:bg-linen transition-colors ${!n.read ? 'bg-sage-50/50' : ''}`}
+                          className={`p-4 border-b border-linen cursor-pointer hover:bg-linen transition-all group ${!n.read ? 'bg-sage-50/50 border-l-4 border-l-sage' : ''}`}
                         >
-                          <div className="flex justify-between items-start mb-1">
-                            <span className="font-bold text-sm text-charcoal">{n.senderName}</span>
-                            {!n.read && <span className="w-2 h-2 bg-terra rounded-full"></span>}
+                          <div className="flex justify-between items-start mb-1 gap-2">
+                            <div className="flex flex-col">
+                              <span className="font-bold text-sm text-charcoal truncate">{n.senderName}</span>
+                              <span className="text-[9px] font-bold text-muted uppercase tracking-wider">{formatNotificationTime(n.createdAt)}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {!n.read && <span className="w-2 h-2 bg-terra rounded-full shrink-0"></span>}
+                              <button 
+                                onClick={(e) => deleteNotification(e, n.id)}
+                                className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 hover:bg-red-50 rounded-lg text-red-500"
+                                title="Delete notification"
+                              >
+                                🗑️
+                              </button>
+                            </div>
                           </div>
-                          <p className="text-xs text-muted">{n.message}</p>
+                          <p className="text-xs text-muted leading-relaxed break-words pr-4">{n.message}</p>
                         </div>
                       ))
                     )}
@@ -198,7 +250,7 @@ export default function AppLayout({ children }) {
               ?
             </button>
             <div className="flex items-center gap-3 ml-2">
-              <span className="text-sm font-semibold text-charcoal hidden sm:block">
+              <span className="text-xs sm:text-sm font-semibold text-charcoal hidden sm:block">
                 {isAdmin ? 'Hi Admin' : `Hi, ${user?.displayName?.split(' ')[0] || 'User'}`}
               </span>
               <div className="w-9 h-9 rounded-full bg-sage flex items-center justify-center text-white text-sm font-bold overflow-hidden border border-linen-dark">

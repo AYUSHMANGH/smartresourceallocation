@@ -5,6 +5,9 @@ import {
 } from 'firebase/firestore';
 import { db } from './config';
 
+// Export primitives for custom queries
+export { query, where, orderBy, limit } from 'firebase/firestore';
+
 // ── Generic helpers ──────────────────────────────────────────────────────────
 
 export const addDocument = async (collectionName, data) => {

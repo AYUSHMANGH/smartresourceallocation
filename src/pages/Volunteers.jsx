@@ -16,8 +16,15 @@ export default function Volunteers() {
   useEffect(() => {
     // Fetch real registered users from the 'users' collection
     const unsub = subscribeToCollection('users', (data) => {
+      // Sort: newest at top
+      const sorted = data.sort((a, b) => {
+        const timeA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
+        const timeB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
+        return timeB - timeA;
+      });
+
       // Show all registered users who have a document in the users collection
-      const activeVolunteers = data.filter(u => u.email !== 'admin@email.com');
+      const activeVolunteers = sorted.filter(u => u.email !== 'admin@email.com');
       
       // Map them to ensure they have the properties expected by the UI
       const mappedVolunteers = activeVolunteers.map(u => ({
@@ -111,7 +118,7 @@ export default function Volunteers() {
         </div>
 
         {/* Filter Bar */}
-        <div className="card p-4 mb-8 flex flex-col md:flex-row gap-4 items-center">
+        <div className="card p-4 mb-8 flex flex-col lg:flex-row gap-4 items-stretch lg:items-center">
           <div className="relative flex-1">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted">🔍</span>
             <input 
@@ -122,11 +129,11 @@ export default function Volunteers() {
               className="input-field pl-10"
             />
           </div>
-          <div className="flex gap-2">
-            <button onClick={handleFilterToggle} className="btn-secondary px-6">
+          <div className="grid grid-cols-2 lg:flex gap-2">
+            <button onClick={handleFilterToggle} className="btn-secondary whitespace-nowrap">
               {sortBy === 'none' ? 'Filters' : `Sorted: ${sortBy}`}
             </button>
-            <button onClick={() => setShowAddModal(true)} className="btn-primary px-6">Onboard Volunteer</button>
+            <button onClick={() => setShowAddModal(true)} className="btn-primary whitespace-nowrap">Onboard</button>
           </div>
         </div>
 
@@ -134,14 +141,14 @@ export default function Volunteers() {
         {showAddModal && (
           <div className="mb-8 p-6 bg-linen rounded-2xl border border-linen-dark animate-in">
             <h3 className="text-lg font-bold text-charcoal mb-4">Onboard New Volunteer</h3>
-            <div className="grid md:grid-cols-3 gap-4 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
               <input placeholder="Full Name" value={newVol.name} onChange={e => setNewVol(p => ({...p, name: e.target.value}))} className="input-field" />
               <input placeholder="Location" value={newVol.location} onChange={e => setNewVol(p => ({...p, location: e.target.value}))} className="input-field" />
               <input placeholder="Skills (comma separated)" value={newVol.skills} onChange={e => setNewVol(p => ({...p, skills: e.target.value}))} className="input-field" />
             </div>
-            <div className="flex gap-3">
-              <button onClick={handleAddVolunteer} className="btn-primary">Save Volunteer</button>
-              <button onClick={() => setShowAddModal(false)} className="btn-secondary">Cancel</button>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button onClick={handleAddVolunteer} className="btn-primary w-full sm:w-auto">Save Volunteer</button>
+              <button onClick={() => setShowAddModal(false)} className="btn-secondary w-full sm:w-auto">Cancel</button>
             </div>
           </div>
         )}

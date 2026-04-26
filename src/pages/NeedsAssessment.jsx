@@ -87,9 +87,9 @@ export default function NeedsAssessment() {
           <p className="text-muted text-sm mt-1">Report community requirements directly from the field for rapid response coordination.</p>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="flex flex-col lg:grid lg:grid-cols-3 gap-6">
           {/* Form */}
-          <div className="lg:col-span-2 flex flex-col gap-5">
+          <div className="lg:col-span-2 flex flex-col gap-4 sm:gap-5">
             {/* General Classification */}
             <div className="card p-6">
               <div className="flex items-center gap-3 mb-5">
@@ -227,7 +227,7 @@ export default function NeedsAssessment() {
           </div>
 
           {/* Priority Score Sidebar */}
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 lg:sticky lg:top-24 h-fit">
             {/* Score Card */}
             <div className="bg-sage rounded-2xl p-6 text-white">
               <p className="text-xs font-bold uppercase tracking-widest text-white opacity-70 mb-2">Calculated Priority Score</p>

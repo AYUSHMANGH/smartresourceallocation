@@ -1,21 +1,30 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signInWithGoogle, signInAdmin } from '../firebase/auth';
+import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 
 export default function Login() {
   const navigate = useNavigate();
+  const { user, role, loading: authLoading } = useAuth();
   const [adminEmail, setAdminEmail] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [adminLoading, setAdminLoading] = useState(false);
+
+  React.useEffect(() => {
+    if (!authLoading && user) {
+      if (role === 'admin') navigate('/governance');
+      else navigate('/dashboard');
+    }
+  }, [user, role, authLoading, navigate]);
 
   const handleGoogleLogin = async () => {
     setLoading(true);
     try {
       await signInWithGoogle();
       toast.success('Welcome, Volunteer!');
-      navigate('/dashboard');
+      // Navigation is now handled by useEffect to prevent race conditions
     } catch (err) {
       toast.error(err.message || 'Google sign-in failed');
     } finally {
@@ -28,8 +37,8 @@ export default function Login() {
     setAdminLoading(true);
     try {
       await signInAdmin(adminEmail, adminPassword);
-      toast.success('Welcome back, Admin!');
-      navigate('/governance');
+      toast.success('Authenticating admin...');
+      // Navigation is now handled by useEffect to prevent race conditions
     } catch (err) {
       toast.error('Invalid admin credentials');
     } finally {

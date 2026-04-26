@@ -112,13 +112,13 @@ export default function NeedsMapPicker({ onLocationSelect }) {
         {mapCenter && <CenterMap position={mapCenter} />}
       </MapContainer>
       
-      <div className="absolute top-4 left-4 right-4 pointer-events-none z-[400]">
+      <div className="absolute top-4 left-4 right-4 pointer-events-none z-[10]">
         <div className="glass px-3 py-2 rounded-xl text-[10px] font-bold text-muted uppercase tracking-wider flex items-center gap-2 w-fit">
           <span>📍</span> Click map or drag pin to specify location
         </div>
       </div>
       <button 
-        className="absolute bottom-4 right-4 bg-white text-charcoal px-4 py-2 rounded-xl text-xs font-bold shadow-lg border border-linen-dark hover:bg-linen transition-colors active:scale-95 flex items-center gap-2 z-[400]"
+        className="absolute bottom-4 right-4 bg-white text-charcoal px-4 py-2 rounded-xl text-xs font-bold shadow-lg border border-linen-dark hover:bg-linen transition-colors active:scale-95 flex items-center gap-2 z-[10]"
         onClick={handleMyLocation}
       >
         <span>🎯</span> Use My Location

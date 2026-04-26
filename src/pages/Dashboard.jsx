@@ -134,8 +134,8 @@ export default function Dashboard() {
                   View All <span>›</span>
                 </button>
               </div>
-              <div className="overflow-x-auto">
-                <div className="min-w-[500px]">
+              <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+                <div className="min-w-[450px] lg:min-w-0">
                   <div className="mb-3 grid grid-cols-4 gap-4">
                     <span className="section-label">Need Type</span>
                     <span className="section-label">Location</span>

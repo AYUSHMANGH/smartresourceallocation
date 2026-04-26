@@ -32,8 +32,13 @@ export default function Governance() {
 
   useEffect(() => {
     const u1 = subscribeToCollection('users', (data) => {
-      setUsers(data.filter(u => u.status !== 'pending'));
-      setApplicants(data.filter(u => u.status === 'pending'));
+      const sorted = data.sort((a, b) => {
+        const timeA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
+        const timeB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
+        return timeB - timeA;
+      });
+      setUsers(sorted.filter(u => u.status !== 'pending'));
+      setApplicants(sorted.filter(u => u.status === 'pending'));
     });
     const u2 = subscribeToCollection('audit_logs', setAuditLogs, [orderBy('createdAt', 'desc'), limit(6)]);
     return () => { u1(); u2(); };
@@ -221,6 +226,7 @@ export default function Governance() {
                     <div className="flex justify-between items-start mb-5">
                       <div>
                         <h3 className="text-lg font-bold text-charcoal">Manage User</h3>
+                        <p className="text-[10px] text-muted font-mono">ID: {manageModal.user.id}</p>
                         <p className="text-xs text-muted">{manageModal.user.email}</p>
                       </div>
                       <button onClick={() => setManageModal({ show: false, user: null, message: '' })} className="text-muted hover:text-charcoal font-bold">✕</button>
@@ -276,8 +282,8 @@ export default function Governance() {
               )}
 
               {activeTab === 'users' ? (
-                <div className="overflow-x-auto">
-                  <div className="min-w-[600px]">
+                <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+                  <div className="min-w-[480px] lg:min-w-0">
                     <div className="grid grid-cols-4 gap-4 mb-3 px-2">
                       {['FULL NAME', 'ROLE', 'STATUS', 'ACTIONS'].map(h => (
                         <span key={h} className="section-label">{h}</span>
@@ -285,14 +291,17 @@ export default function Governance() {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                      {users.map((u, i) => (
+                      {displayUsers.map((u, i) => (
                         <div key={u.id || i} className="grid grid-cols-4 gap-4 items-center p-3 rounded-xl hover:bg-linen transition-colors border border-transparent hover:border-linen-dark/20">
                           <div className="flex items-center gap-3">
                             <div className="w-9 h-9 rounded-full bg-sage-50 flex items-center justify-center text-[10px] font-bold text-sage-dark uppercase overflow-hidden shrink-0">
                               {u.avatar?.startsWith('http') ? <img src={u.avatar} alt="avatar" className="w-full h-full object-cover" /> : (u.avatar || u.name?.slice(0, 2).toUpperCase())}
                             </div>
                             <div>
-                              <p className="text-sm font-semibold text-charcoal">{u.name}</p>
+                              <p className="text-sm font-semibold text-charcoal flex items-center gap-2">
+                                {u.name}
+                                {!u.createdAt && <span className="text-[8px] bg-linen px-1 rounded">MOCK</span>}
+                              </p>
                               <p className="text-[10px] text-muted">{u.email}</p>
                             </div>
                           </div>

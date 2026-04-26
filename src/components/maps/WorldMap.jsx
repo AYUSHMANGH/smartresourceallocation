@@ -48,14 +48,14 @@ export default function WorldMap() {
       </MapContainer>
       
       {/* Map HUD Overlay */}
-      <div className="absolute top-4 left-4 flex flex-col gap-2 pointer-events-none z-[400]">
+      <div className="absolute top-4 left-4 flex flex-col gap-2 pointer-events-none z-[10]">
         <div className="glass-dark px-3 py-1.5 rounded-lg flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-critical animate-pulse" />
           <span className="text-[10px] font-bold text-white uppercase tracking-wider">Live Response Tracking</span>
         </div>
       </div>
 
-      <div className="absolute bottom-4 right-4 flex gap-2 z-[400]">
+      <div className="absolute bottom-4 right-4 flex gap-2 z-[10]">
         <div className="glass-dark px-3 py-2 rounded-xl flex flex-col gap-1">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-critical" />

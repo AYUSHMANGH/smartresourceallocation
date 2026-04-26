@@ -12,13 +12,30 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthChange(async (firebaseUser) => {
       if (firebaseUser) {
-        const profile = await getDocument('users', firebaseUser.uid);
+        let profile = await getDocument('users', firebaseUser.uid);
+        
+        // Create profile if first time login
+        if (!profile) {
+          const isDefaultAdmin = firebaseUser.email === 'admin@email.com';
+          const newProfile = {
+            name: firebaseUser.displayName || 'New User',
+            email: firebaseUser.email,
+            role: isDefaultAdmin ? 'administrator' : 'field_worker',
+            status: isDefaultAdmin ? 'approved' : 'pending',
+            avatar: firebaseUser.photoURL || firebaseUser.displayName?.slice(0, 2).toUpperCase() || 'U',
+            createdAt: new Date().toISOString()
+          };
+          const { setDocument } = await import('../firebase/firestore');
+          await setDocument('users', firebaseUser.uid, newProfile);
+          profile = newProfile;
+        }
+
         setUser({ 
           ...firebaseUser, 
-          status: profile?.status || (firebaseUser.email === 'admin@email.com' ? 'approved' : 'pending'),
-          profileName: profile?.name || firebaseUser.displayName
+          status: profile.status,
+          profileName: profile.name
         });
-        setRole(getUserRole(firebaseUser));
+        setRole(profile.role === 'administrator' ? 'admin' : 'volunteer');
       } else {
         setUser(null);
         setRole(null);

@@ -46,19 +46,19 @@ export default function Chatbot() {
   }, [response, loading]);
 
   return (
-    <div className="fixed bottom-8 right-8 z-[100] font-manrope">
+    <div className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 z-[100] font-manrope">
       {/* Floating Bubble */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="w-16 h-16 rounded-full bg-sage shadow-2xl flex items-center justify-center text-3xl hover:scale-110 transition-transform active:scale-95 group relative"
+        className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-sage shadow-2xl flex items-center justify-center text-2xl sm:text-3xl hover:scale-110 transition-transform active:scale-95 group relative"
       >
-        <span className="relative z-10 text-2xl">{isOpen ? '✕' : '🤖'}</span>
+        <span className="relative z-10 text-xl sm:text-2xl">{isOpen ? '✕' : '🤖'}</span>
         {!isOpen && <span className="absolute inset-0 rounded-full bg-sage animate-ping opacity-20" />}
       </button>
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="absolute bottom-20 right-0 w-[380px] h-[520px] glass-dark rounded-3xl overflow-hidden shadow-3xl animate-in flex flex-col border border-white/10">
+        <div className="absolute bottom-16 sm:bottom-20 right-0 w-[calc(100vw-2rem)] sm:w-[380px] h-[70vh] sm:h-[520px] glass-dark rounded-3xl overflow-hidden shadow-3xl animate-in flex flex-col border border-white/10">
           {/* Header */}
           <div className="bg-sage p-4 flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-white">🤖</div>
