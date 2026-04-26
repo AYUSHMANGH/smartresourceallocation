@@ -1,5 +1,5 @@
-# Use the official Node.js image.
-FROM node:20-slim
+# Use the official Node.js image (full version for build tools).
+FROM node:20
 
 # Create and change to the app directory.
 WORKDIR /usr/src/app
@@ -13,8 +13,8 @@ RUN npm install
 # Copy local code to the container image.
 COPY . .
 
-# Build the static site.
-RUN npm run build
+# Build the static site and show logs.
+RUN npm run build && ls -la dist/
 
 # Expose the port the app runs on.
 EXPOSE 8080
