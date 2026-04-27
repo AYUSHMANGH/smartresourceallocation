@@ -1,17 +1,22 @@
 <div align="center">
 
-  ![ResilienceNet Banner](https://img.shields.io/badge/ResilienceNet-Smart%20Governance-6B7F5E?style=for-the-badge&logo=react&logoColor=white)
+  ![ResilienceNet Banner](resiliencenet_banner.png)
 
   # 🌍 ResilienceNet
   ### Smart Venue Governance & Resource Allocation Platform
 
-  [![React](https://img.shields.io/badge/React-18.2.0-61DAFB?style=flat-square&logo=react&logoColor=black)](https://reactjs.org/)
-  [![Vite](https://img.shields.io/badge/Vite-5.1.0-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev/)
-  [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4.1-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-  [![Firebase](https://img.shields.io/badge/Firebase-10.8.0-FFCA28?style=flat-square&logo=firebase&logoColor=black)](https://firebase.google.com/)
-  [![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
+  [![Status](https://img.shields.io/badge/Status-Live-success?style=for-the-badge&logo=statuspage&logoColor=white)](https://resiliencenet.example.com)
+  [![AI Engine](https://img.shields.io/badge/AI_Engine-Groq_Llama_3-orange?style=for-the-badge&logo=lightning&logoColor=white)](https://groq.com)
+  [![Resource Manager](https://img.shields.io/badge/Resource_Manager-Gemini_1.5-blue?style=for-the-badge&logo=google-gemini&logoColor=white)](https://deepmind.google/technologies/gemini/)
 
   **A modern, high-performance web application for intelligent disaster management, volunteer orchestration, and real-time governance.**
+
+  ---
+
+  ### ⚡ Quick Status
+  `● System Online` · `● AI Analysis Ready` · `● Gemini Orchestrator Active`
+
+  ---
 
   [Features](#-key-features) • [Tech Stack](#-technology-stack) • [Getting Started](#-getting-started) • [Architecture](#-architecture) • [Contributing](#-contributing)
 
@@ -40,7 +45,8 @@ ResilienceNet is a cutting-edge crisis management platform that leverages AI, re
 
 ### 🌟 Key Highlights
 
-- **AI-Powered Analysis**: Leverages Groq's Llama-3.3-70b for real-time disaster risk assessment
+- **AI-Powered Analysis**: Leverages Groq's Llama-3.3-70B for real-time disaster risk assessment.
+- **Intelligent Resource Management**: Powered by **Google Gemini 1.5** for high-level resource orchestration and planning.
 - **Real-Time Coordination**: Firebase-powered instant notifications and updates
 - **Geographic Intelligence**: Interactive maps with precise geolocation tracking
 - **Smart Matching**: Algorithmic volunteer-to-task matching system
@@ -57,10 +63,10 @@ ResilienceNet is a cutting-edge crisis management platform that leverages AI, re
 - Visual crisis density mapping
 
 ### 🤖 AI-Powered Area Analysis
-- Integration with Groq's `llama-3.3-70b-versatile` model
-- On-the-fly disaster preparedness reports
-- Risk analysis for any selected region
-- Predictive insights for resource planning
+- **Groq Integration**: Powered by `llama-3.3-70b-versatile` for lightning-fast analysis.
+- **Gemini Resource Manager**: Uses Google Gemini for intelligent resource allocation and NGO task orchestration.
+- **Real-Time Risk Reports**: On-the-fly disaster preparedness reports for any selected region.
+- **Predictive Insights**: Advanced data-driven forecasting for emergency response.
 
 ### 👥 Volunteer Network & Matchmaking
 - **Authentic Google Sign-in**: Real profiles with dynamic profile image sync
@@ -116,7 +122,8 @@ ResilienceNet is a cutting-edge crisis management platform that leverages AI, re
 ### AI Integration
 | Service | Model | Use Case |
 |---------|-------|----------|
-| **Groq Cloud API** | llama-3.3-70b-versatile | Disaster Analysis & Risk Assessment |
+| **Google Gemini API** | Gemini 1.5 Pro | Intelligent Insights & Chatbot Assistant |
+| **Groq Cloud API** | Llama 3.3 70B | Real-time Disaster Risk Assessment |
 
 ### Utilities
 | Package | Purpose |
@@ -206,8 +213,9 @@ VITE_FIREBASE_STORAGE_BUCKET="your_project_id.appspot.com"
 VITE_FIREBASE_MESSAGING_SENDER_ID="your_sender_id"
 VITE_FIREBASE_APP_ID="your_firebase_app_id"
 
-# Groq AI Configuration
+# AI Configuration
 VITE_GROQ_API_KEY="your_groq_api_key"
+VITE_GEMINI_API_KEY="your_gemini_api_key"
 
 # Google Maps Configuration
 VITE_GOOGLE_MAPS_API_KEY="your_google_maps_api_key"
